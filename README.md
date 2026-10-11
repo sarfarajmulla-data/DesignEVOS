@@ -206,11 +206,19 @@ See the in-app **Methodology** page for full assumptions and limitations.
 UI code talks only to the service interfaces in `src/services/index.ts`. Today every service is
 backed by the local demo model, and no network requests are made.
 
-To connect real data:
+To connect the EVOS backend, copy `.env.example` to `.env.local` and set the browser-safe API origin:
 
-1. Implement the same service interfaces against your backend (for example Supabase queries or a REST API).
-2. Return your implementation from `getBackend()` in `src/services/index.ts`.
-3. Keep provenance labels accurate (`simulated`, `imported`, `live`) so users always know where numbers come from.
+```bash
+VITE_EVOS_API_URL=http://localhost:8000
+```
+
+The frontend uses the `/health`, `/ready`, and `/api/v1` EVOS routes for fleet, chargers,
+scenario, scheduling, simulations, energy, battery health, forecasting, maintenance, datasets,
+sustainability, confidence, explainability, and evaluation. Non-2xx and network failures are
+surfaced as `EvosApiError`; a configured API is never silently replaced by demo values. Without
+`VITE_EVOS_API_URL`, the deterministic demo adapter remains active. Backend fractions such as
+`renewable_share` and `state_of_charge` are normalized to the UI's percentage contract, and
+backend provenance is preserved rather than presented as measured data.
 
 The `supabase/` and `utils/supabase/` folders are optional scaffolding and are not used by the demo.
 Never commit service-role keys or other secrets; keep them in environment variables on your host.
